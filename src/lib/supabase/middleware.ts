@@ -37,7 +37,7 @@ export async function updateSession(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser();
 
-    const publicPaths = ['/login', '/auth/callback'];
+    const publicPaths = ['/login', '/auth/callback', '/offline'];
     const isPublicPath = publicPaths.some(path =>
         request.nextUrl.pathname.startsWith(path)
     );

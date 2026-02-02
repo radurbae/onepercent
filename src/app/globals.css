@@ -66,3 +66,20 @@ dialog[open]::backdrop {
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+
+/* Slide up animation for iOS install banner */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
