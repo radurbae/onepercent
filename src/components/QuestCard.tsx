@@ -97,7 +97,8 @@ export default function QuestCard({
                 {isMainQuest && (
                     <button
                         onClick={() => setIsExpanded(!isExpanded)}
-                        className="p-1 rounded-full hover:bg-white/5 text-xs text-zinc-500 hover:text-zinc-300"
+                        className="p-1 rounded-full text-xs hover:opacity-80 transition-opacity"
+                        style={{ color: 'var(--foreground-muted)' }}
                     >
                         {isExpanded ? 'Hide Info' : 'Show Info'}
                     </button>
@@ -119,30 +120,39 @@ export default function QuestCard({
 
             {/* Expanded Details */}
             {isExpanded && isMainQuest && (
-                <div className="mb-4 bg-black/20 rounded-lg p-3 space-y-2 text-sm border border-white/5">
+                <div
+                    className="mb-4 rounded-lg p-3 space-y-2 text-sm border"
+                    style={{
+                        backgroundColor: 'var(--background-secondary)',
+                        borderColor: 'var(--border)'
+                    }}
+                >
                     {habit.obvious_cue && (
                         <div>
-                            <span className="text-zinc-400 text-xs uppercase tracking-wider block mb-0.5">When (Cue)</span>
-                            <span className="text-zinc-200">{habit.obvious_cue}</span>
+                            <span className="text-xs uppercase tracking-wider block mb-0.5" style={{ color: 'var(--foreground-muted)' }}>When (Cue)</span>
+                            <span style={{ color: 'var(--foreground)' }}>{habit.obvious_cue}</span>
                         </div>
                     )}
                     {habit.attractive_bundle && (
                         <div>
-                            <span className="text-zinc-400 text-xs uppercase tracking-wider block mb-0.5">Pair With (Bundle)</span>
-                            <span className="text-zinc-200">{habit.attractive_bundle}</span>
+                            <span className="text-xs uppercase tracking-wider block mb-0.5" style={{ color: 'var(--foreground-muted)' }}>Pair With (Bundle)</span>
+                            <span style={{ color: 'var(--foreground)' }}>{habit.attractive_bundle}</span>
                         </div>
                     )}
                     {habit.satisfying_reward && (
                         <div>
-                            <span className="text-zinc-400 text-xs uppercase tracking-wider block mb-0.5">Real Life Reward</span>
-                            <span className="text-zinc-200">{habit.satisfying_reward}</span>
+                            <span className="text-xs uppercase tracking-wider block mb-0.5" style={{ color: 'var(--foreground-muted)' }}>Real Life Reward</span>
+                            <span style={{ color: 'var(--foreground)' }}>{habit.satisfying_reward}</span>
                         </div>
                     )}
                 </div>
             )}
 
             {/* Rewards Preview */}
-            <div className="flex items-center gap-4 text-sm mb-4 bg-white/5 p-2 rounded-lg">
+            <div
+                className="flex items-center gap-4 text-sm mb-4 p-2 rounded-lg"
+                style={{ backgroundColor: 'var(--background-secondary)' }}
+            >
                 <span className="flex items-center gap-1.5 text-indigo-400 font-medium">
                     <Sparkles className="w-4 h-4" />
                     +{rewardXP} XP
