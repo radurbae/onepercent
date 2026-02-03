@@ -9,7 +9,11 @@ export default function ThemeToggle() {
     return (
         <button
             onClick={toggleTheme}
-            className="w-10 h-10 rounded-full bg-zinc-800 dark:bg-zinc-800 light:bg-gray-200 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+            style={{
+                background: 'var(--card-bg)',
+                color: 'var(--foreground-muted)',
+            }}
             aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
         >
             {theme === 'dark' ? (

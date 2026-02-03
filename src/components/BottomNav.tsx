@@ -16,8 +16,12 @@ export default function BottomNav() {
 
     return (
         <nav
-            className="fixed bottom-0 left-0 right-0 bg-zinc-900/95 backdrop-blur-lg border-t border-zinc-800 z-40 md:hidden"
-            style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+            className="fixed bottom-0 left-0 right-0 backdrop-blur-lg border-t z-40 md:hidden"
+            style={{
+                paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+                background: 'var(--card-bg)',
+                borderColor: 'var(--border-color)',
+            }}
         >
             <div className="flex items-center justify-around h-16">
                 {navItems.map((item) => {
@@ -33,7 +37,7 @@ export default function BottomNav() {
                 transition-all duration-150
                 ${isActive
                                     ? 'text-indigo-400'
-                                    : 'text-zinc-500 hover:text-zinc-300'
+                                    : 'text-[var(--foreground-muted)] hover:text-[var(--foreground)]'
                                 }
               `}
                             aria-current={isActive ? 'page' : undefined}

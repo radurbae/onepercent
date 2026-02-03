@@ -128,7 +128,8 @@ export default function ProfilePage() {
                     <ThemeToggle />
                     <Link
                         href="/account"
-                        className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+                        className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                        style={{ background: 'var(--card-bg)', color: 'var(--foreground-muted)' }}
                     >
                         <Settings className="w-5 h-5" />
                     </Link>
