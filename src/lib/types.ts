@@ -218,3 +218,100 @@ export const QUEST_CATEGORY_COLORS: Record<QuestCategory, string> = {
   fitness: '#ef4444',
   creativity: '#a855f7',
 };
+
+// =====================================================
+// ITEM & ACHIEVEMENT TYPES
+// =====================================================
+
+export type ItemType = 'title' | 'badge' | 'theme' | 'artifact';
+export type EffectType = 'xp_boost' | 'gold_boost' | 'streak_buffer' | 'category_xp_boost' | 'skip_penalty_reduce';
+
+export interface Item {
+  id: string;
+  name: string;
+  type: ItemType;
+  rarity: LootRarity;
+  description: string | null;
+  effect_type: EffectType | null;
+  effect_value: number | null;
+  effect_category: string | null;
+  icon_key: string;
+  unlock_condition: string | null;
+  unlock_key: string | null;
+  created_at: string;
+}
+
+export interface UserItem {
+  id: string;
+  user_id: string;
+  item_id: string;
+  equipped: boolean;
+  unlocked_at: string;
+  item?: Item; // Joined
+}
+
+export interface Achievement {
+  id: string;
+  user_id: string;
+  key: string;
+  unlocked_at: string;
+}
+
+export interface ItemEffect {
+  type: EffectType;
+  value: number;
+  category?: string;
+  source: string; // item name
+}
+
+export interface EquippedEffects {
+  xpBoostPercent: number;      // Total XP boost percentage (capped at 20%)
+  goldBoostPercent: number;    // Total gold boost percentage
+  categoryBoosts: Record<string, number>; // Category-specific XP boosts
+  skipPenaltyReduce: number;   // Skip penalty reduction percentage
+  streakBuffer: number;        // Extra streak buffer days
+}
+
+// Achievement definitions with unlock conditions
+export const ACHIEVEMENT_DEFINITIONS: Record<string, {
+  name: string;
+  check: (stats: AchievementStats) => boolean;
+}> = {
+  first_quest: { name: 'First Quest', check: (s) => s.totalQuests >= 1 },
+  streak_7: { name: '7-Day Streak', check: (s) => s.currentStreak >= 7 },
+  streak_14: { name: '14-Day Streak', check: (s) => s.currentStreak >= 14 },
+  streak_30: { name: '30-Day Streak', check: (s) => s.currentStreak >= 30 },
+  quests_30: { name: '30 Quests', check: (s) => s.totalQuests >= 30 },
+  quests_50: { name: '50 Quests', check: (s) => s.totalQuests >= 50 },
+  quests_100: { name: '100 Quests', check: (s) => s.totalQuests >= 100 },
+  focus_15: { name: 'Focus 15', check: (s) => s.focusQuests >= 15 },
+  focus_20: { name: 'Focus 20', check: (s) => s.focusQuests >= 20 },
+  focus_30: { name: 'Focus 30', check: (s) => s.focusQuests >= 30 },
+  learning_20: { name: 'Learning 20', check: (s) => s.learningQuests >= 20 },
+  learning_30: { name: 'Learning 30', check: (s) => s.learningQuests >= 30 },
+  learning_50: { name: 'Learning 50', check: (s) => s.learningQuests >= 50 },
+  wellness_20: { name: 'Wellness 20', check: (s) => s.wellnessQuests >= 20 },
+  comeback: { name: 'Comeback', check: (s) => s.comebackCount >= 1 },
+  level_5: { name: 'Level 5', check: (s) => s.level >= 5 },
+  rank_a: { name: 'Rank A', check: (s) => s.rank === 'A' || s.rank === 'S' || s.rank === 'SS' },
+  morning_10: { name: 'Morning 10', check: (s) => s.morningCount >= 10 },
+  night_10: { name: 'Night 10', check: (s) => s.nightCount >= 10 },
+  perfect_week: { name: 'Perfect Week', check: (s) => s.perfectWeeks >= 1 },
+  no_skip_30: { name: 'No Skip 30', check: (s) => s.daysWithoutSkip >= 30 },
+};
+
+export interface AchievementStats {
+  totalQuests: number;
+  currentStreak: number;
+  focusQuests: number;
+  learningQuests: number;
+  wellnessQuests: number;
+  comebackCount: number;
+  level: number;
+  rank: Rank;
+  morningCount: number;
+  nightCount: number;
+  perfectWeeks: number;
+  daysWithoutSkip: number;
+}
+

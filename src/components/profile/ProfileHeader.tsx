@@ -127,6 +127,12 @@ export default function ProfileHeader({ profile, email, todaySummary }: ProfileH
                     <p className="text-sm truncate" style={{ color: 'var(--foreground-muted)' }}>
                         {email || 'Adventurer'}
                     </p>
+                    {/* Equipped Title */}
+                    {profile.equipped_title && (
+                        <p className="text-xs mt-1" style={{ color: 'var(--primary)' }}>
+                            📜 {profile.equipped_title}
+                        </p>
+                    )}
                 </div>
 
                 {/* Gold */}
