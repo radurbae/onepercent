@@ -14,7 +14,7 @@ import { formatDate, getYesterdayDate } from '@/lib/utils/dates';
 import { shouldShowHabitOnDate } from '@/lib/utils/schedule';
 import { calculateStreak } from '@/lib/utils/streak';
 import { calculateRewards, levelFromXp, rollForLoot } from '@/lib/utils/rewards';
-import { getDailyQuests, completeDailyQuest, refreshDailyQuests } from '@/lib/utils/quests';
+import { getDailyQuests, completeDailyQuest, refreshDailyQuests, type YesterdayEvaluation } from '@/lib/utils/quests';
 
 interface QuestHabit extends Habit {
     checkin: Checkin | null;
@@ -24,6 +24,7 @@ interface QuestHabit extends Habit {
 export default function QuestsPage() {
     const [quests, setQuests] = useState<QuestHabit[]>([]);
     const [randomQuests, setRandomQuests] = useState<DailyQuest[]>([]);
+    const [punishmentInfo, setPunishmentInfo] = useState<YesterdayEvaluation | null>(null);
     const [profile, setProfile] = useState<PlayerProfile | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -69,11 +70,14 @@ export default function QuestsPage() {
             return { ...habit, checkin: todayCheckin, streak };
         });
 
-        // Fetch random quests
-        const daily = await getDailyQuests();
+        // Fetch random quests (with yesterday evaluation)
+        const { quests: daily, evaluation } = await getDailyQuests();
 
         setQuests(enrichedQuests);
         setRandomQuests(daily);
+        if (evaluation && evaluation.missedQuests > 0) {
+            setPunishmentInfo(evaluation);
+        }
         setProfile(profileData || null);
         setIsLoading(false);
     }, [today, yesterday]);
@@ -192,7 +196,7 @@ export default function QuestsPage() {
         if (result) {
             showToast(`+${result.xp} XP, +${result.gold} Gold`, 'success');
             // Refresh to get updated quest status
-            const updated = await getDailyQuests();
+            const { quests: updated } = await getDailyQuests();
             setRandomQuests(updated);
         }
 
@@ -242,6 +246,33 @@ export default function QuestsPage() {
                     </p>
                 </div>
             </div>
+
+            {/* Punishment Banner for Missed Quests */}
+            {punishmentInfo && punishmentInfo.missedQuests > 0 && (
+                <div className="card p-4 mb-6 border-red-500/30 bg-red-500/10">
+                    <div className="flex items-start gap-3">
+                        <span className="text-2xl">⚠️</span>
+                        <div className="flex-1">
+                            <p className="font-semibold text-red-400 mb-1">
+                                {punishmentInfo.missedQuests} quest{punishmentInfo.missedQuests > 1 ? 's' : ''} missed yesterday
+                            </p>
+                            <p className="text-sm italic mb-2" style={{ color: 'var(--foreground-muted)' }}>
+                                &ldquo;{punishmentInfo.message}&rdquo;
+                            </p>
+                            <div className="flex gap-4 text-xs">
+                                <span className="text-red-400">-{punishmentInfo.xpPenalty} XP</span>
+                                <span className="text-red-400">-{punishmentInfo.goldPenalty} 🪙</span>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setPunishmentInfo(null)}
+                            className="text-zinc-500 hover:text-zinc-300 transition-colors"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Daily Clear Banner */}
             {totalCompleted === totalQuests && totalQuests > 0 && (
