@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import AppShell from '@/components/AppShell';
 import PlayerCard from '@/components/PlayerCard';
+import ThemeToggle from '@/components/ThemeToggle';
 import { Settings } from 'lucide-react';
 import Link from 'next/link';
 import type { PlayerProfile, PlayerStats } from '@/lib/types';
@@ -123,12 +124,15 @@ export default function ProfilePage() {
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-white">Status</h1>
-                <Link
-                    href="/account"
-                    className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
-                >
-                    <Settings className="w-5 h-5" />
-                </Link>
+                <div className="flex items-center gap-2">
+                    <ThemeToggle />
+                    <Link
+                        href="/account"
+                        className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+                    >
+                        <Settings className="w-5 h-5" />
+                    </Link>
+                </div>
             </div>
 
             {/* Player Card */}
