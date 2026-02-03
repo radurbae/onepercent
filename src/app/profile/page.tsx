@@ -147,44 +147,56 @@ export default function ProfilePage() {
                 <h2 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--foreground-muted)' }}>
                     Stats
                 </h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {stats && (
                         <>
                             <StatCard
-                                label="Consistency"
+                                label="CON"
+                                fullName="Consistency"
                                 stat={stats.consistency}
                                 icon={Target}
                                 color="#22c55e"
+                                description="Your 7-day completion rate across all quests and habits."
                             />
                             <StatCard
-                                label="Focus"
+                                label="FOC"
+                                fullName="Focus"
                                 stat={stats.focus}
                                 icon={Zap}
                                 color="#f59e0b"
+                                description="Performance on productivity-related quests."
                             />
                             <StatCard
-                                label="Learning"
+                                label="WIS"
+                                fullName="Wisdom"
                                 stat={stats.learning}
                                 icon={BookOpen}
                                 color="#3b82f6"
+                                description="Growth through learning and knowledge quests."
                             />
                             <StatCard
-                                label="Health"
+                                label="VIT"
+                                fullName="Vitality"
                                 stat={stats.health}
                                 icon={Heart}
                                 color="#ef4444"
+                                description="Physical wellness from fitness and health quests."
                             />
                             <StatCard
-                                label="Environment"
+                                label="CRE"
+                                fullName="Creativity"
                                 stat={stats.environment}
                                 icon={Palette}
                                 color="#a855f7"
+                                description="Artistic expression and creative output."
                             />
                             <StatCard
-                                label="Social"
+                                label="CHA"
+                                fullName="Charisma"
                                 stat={stats.social}
                                 icon={Users}
                                 color="#ec4899"
+                                description="Social connections and relationship building."
                             />
                         </>
                     )}
