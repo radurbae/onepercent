@@ -271,7 +271,8 @@ export default function QuestsPage() {
                         </div>
                         <button
                             onClick={() => setPunishmentInfo(null)}
-                            className="text-zinc-500 hover:text-zinc-300 transition-colors"
+                            className="transition-colors"
+                            style={{ color: 'var(--foreground-muted)' }}
                         >
                             ✕
                         </button>

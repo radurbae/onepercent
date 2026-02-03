@@ -30,14 +30,14 @@ export default function LootDropModal({ isOpen, onClose, loot }: LootDropModalPr
                     <Sparkles className="w-12 h-12 mx-auto text-amber-500" />
                 </div>
 
-                <h2 className="text-xl font-bold text-white mb-6 uppercase tracking-wider">
+                <h2 className="text-xl font-bold mb-6 uppercase tracking-wider" style={{ color: 'var(--foreground)' }}>
                     Loot Drop!
                 </h2>
 
                 {/* Loot Card */}
                 <div
-                    className={`loot-card ${loot.rarity} w-48 mx-auto p-6 rounded-xl bg-zinc-900 border-2`}
-                    style={{ borderColor: rarityColor }}
+                    className={`loot-card ${loot.rarity} w-48 mx-auto p-6 rounded-xl border-2`}
+                    style={{ borderColor: rarityColor, background: 'var(--card-bg)' }}
                 >
                     <div
                         className="text-4xl mb-3"
@@ -63,7 +63,7 @@ export default function LootDropModal({ isOpen, onClose, loot }: LootDropModalPr
                     </span>
                 </div>
 
-                <p className="text-zinc-400 mt-6 mb-6 text-sm">
+                <p className="mt-6 mb-6 text-sm" style={{ color: 'var(--foreground-muted)' }}>
                     Added to your inventory!
                 </p>
 

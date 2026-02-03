@@ -18,7 +18,7 @@ export default function PlayerCard({ profile, stats }: PlayerCardProps) {
             <div className="flex items-start justify-between mb-4">
                 <div>
                     <div className="flex items-center gap-3 mb-1">
-                        <span className="text-2xl font-bold text-white">
+                        <span className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>
                             Lv. {profile.level}
                         </span>
                         <RankBadge rank={profile.rank} />
@@ -47,7 +47,10 @@ export default function PlayerCard({ profile, stats }: PlayerCardProps) {
 
             {/* Equipped badge hint */}
             {profile.equipped_badge && (
-                <div className="mt-4 pt-4 border-t border-zinc-800 flex items-center gap-2 text-sm text-zinc-400">
+                <div
+                    className="mt-4 pt-4 border-t flex items-center gap-2 text-sm"
+                    style={{ borderColor: 'var(--border)', color: 'var(--foreground-muted)' }}
+                >
                     <Sparkles className="w-4 h-4 text-amber-500" />
                     <span>Equipped: {profile.equipped_badge}</span>
                 </div>

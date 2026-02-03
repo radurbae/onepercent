@@ -32,7 +32,7 @@ export default function XPBar({ currentXP, level, showLabel = true, size = 'md' 
             {showLabel && (
                 <div className="flex items-center justify-between mb-1.5">
                     <span className="text-xs font-medium text-indigo-400">EXP</span>
-                    <span className="text-xs text-zinc-400 font-mono">
+                    <span className="text-xs font-mono" style={{ color: 'var(--foreground-muted)' }}>
                         {xpIntoLevel} / {xpNeeded}
                     </span>
                 </div>

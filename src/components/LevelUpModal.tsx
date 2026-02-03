@@ -62,7 +62,7 @@ export default function LevelUpModal({ isOpen, onClose, newLevel }: LevelUpModal
                     {newLevel}
                 </div>
 
-                <p className="text-zinc-400 mt-4 mb-6">
+                <p className="mt-4 mb-6" style={{ color: 'var(--foreground-muted)' }}>
                     Your power grows stronger!
                 </p>
 

@@ -54,7 +54,10 @@ export default function QuestCard({
                             MAIN
                         </span>
                     ) : (
-                        <span className="text-xs font-medium text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded">
+                        <span
+                            className="text-xs font-medium px-2 py-0.5 rounded"
+                            style={{ color: 'var(--foreground-muted)', background: 'var(--background-secondary)' }}
+                        >
                             SIDE
                         </span>
                     )}
@@ -80,13 +83,16 @@ export default function QuestCard({
 
             {/* Quest Title */}
             <Link href={`/habits/${habit.id}`}>
-                <h3 className={`font-semibold text-lg mb-1 ${isCompleted ? 'line-through text-zinc-500' : 'text-white'}`}>
+                <h3
+                    className={`font-semibold text-lg mb-1 ${isCompleted ? 'line-through' : ''}`}
+                    style={{ color: isCompleted ? 'var(--foreground-muted)' : 'var(--foreground)' }}
+                >
                     {habit.title}
                 </h3>
             </Link>
 
             {/* Easy Step */}
-            <p className="text-sm text-zinc-400 mb-4 line-clamp-2">
+            <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--foreground-muted)' }}>
                 <Clock className="w-3.5 h-3.5 inline mr-1" />
                 {habit.easy_step}
             </p>
@@ -129,7 +135,7 @@ export default function QuestCard({
                             ✓ Quest Completed
                         </span>
                     ) : (
-                        <span className="text-zinc-500">Skipped</span>
+                        <span style={{ color: 'var(--foreground-muted)' }}>Skipped</span>
                     )}
                 </div>
             )}

@@ -55,20 +55,26 @@ function LoginForm() {
         setIsLoading(false);
     };
 
+    const inputStyle = {
+        background: 'var(--background-secondary)',
+        borderColor: 'var(--border)',
+        color: 'var(--foreground)',
+    };
+
     return (
         <div className="card p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+            <h2 className="text-xl font-semibold mb-6" style={{ color: 'var(--foreground)' }}>
                 {isSignUp ? 'Create your account' : 'Welcome back'}
             </h2>
 
             {(error || authError) && (
-                <div className="mb-4 p-4 bg-red-50 border border-red-100 rounded-xl text-red-700 text-sm">
+                <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm">
                     {error || 'Authentication error. Please try again.'}
                 </div>
             )}
 
             {message && (
-                <div className="mb-4 p-4 bg-green-50 border border-green-100 rounded-xl text-green-700 text-sm">
+                <div className="mb-4 p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-green-500 text-sm">
                     {message}
                 </div>
             )}
@@ -77,7 +83,8 @@ function LoginForm() {
                 <div>
                     <label
                         htmlFor="email"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: 'var(--foreground)' }}
                     >
                         Email
                     </label>
@@ -87,7 +94,8 @@ function LoginForm() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                        className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                        style={inputStyle}
                         placeholder="you@example.com"
                     />
                 </div>
@@ -95,7 +103,8 @@ function LoginForm() {
                 <div>
                     <label
                         htmlFor="password"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: 'var(--foreground)' }}
                     >
                         Password
                     </label>
@@ -106,7 +115,8 @@ function LoginForm() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         minLength={6}
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                        className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                        style={inputStyle}
                         placeholder="••••••••"
                     />
                 </div>
@@ -152,7 +162,7 @@ function LoginForm() {
                         setError(null);
                         setMessage(null);
                     }}
-                    className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                    className="text-sm text-indigo-500 hover:text-indigo-400 font-medium"
                 >
                     {isSignUp
                         ? 'Already have an account? Sign in'
@@ -167,11 +177,11 @@ function LoginFormFallback() {
     return (
         <div className="card p-6">
             <div className="animate-pulse">
-                <div className="h-6 bg-gray-200 rounded w-1/2 mb-6" />
+                <div className="h-6 rounded w-1/2 mb-6 skeleton" />
                 <div className="space-y-4">
-                    <div className="h-12 bg-gray-200 rounded-xl" />
-                    <div className="h-12 bg-gray-200 rounded-xl" />
-                    <div className="h-12 bg-gray-200 rounded-xl" />
+                    <div className="h-12 rounded-xl skeleton" />
+                    <div className="h-12 rounded-xl skeleton" />
+                    <div className="h-12 rounded-xl skeleton" />
                 </div>
             </div>
         </div>
@@ -181,15 +191,15 @@ function LoginFormFallback() {
 export default function LoginPage() {
     return (
         <div
-            className="min-h-screen flex items-center justify-center bg-gray-50 px-4"
-            style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+            className="min-h-screen flex items-center justify-center px-4"
+            style={{ background: 'var(--background)', paddingTop: 'env(safe-area-inset-top, 0px)' }}
         >
             <div className="w-full max-w-sm">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                    <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--foreground)' }}>
                         1% Better
                     </h1>
-                    <p className="text-gray-500">
+                    <p style={{ color: 'var(--foreground-muted)' }}>
                         Build atomic habits that stick
                     </p>
                 </div>
@@ -198,7 +208,7 @@ export default function LoginPage() {
                     <LoginForm />
                 </Suspense>
 
-                <p className="mt-6 text-center text-sm text-gray-400 italic">
+                <p className="mt-6 text-center text-sm italic" style={{ color: 'var(--foreground-muted)' }}>
                     &ldquo;Every action is a vote for the type<br />of person you wish to become.&rdquo;
                 </p>
             </div>
