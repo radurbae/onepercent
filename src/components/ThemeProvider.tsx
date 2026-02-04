@@ -49,11 +49,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         setThemeState(newTheme);
     };
 
-    // Avoid hydration mismatch
-    if (!mounted) {
-        return <>{children}</>;
-    }
-
     return (
         <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
             {children}
