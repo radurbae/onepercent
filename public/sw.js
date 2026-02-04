@@ -1,9 +1,12 @@
-const CACHE_NAME = 'one-percent-better-v3';
+const CACHE_NAME = 'one-percent-better-v4';
 const OFFLINE_URL = '/offline';
 
 // Static assets to cache immediately
 const STATIC_ASSETS = [
-    '/',
+    '/landing',
+    '/demo',
+    '/privacy',
+    '/terms',
     '/offline',
     '/quests',
     '/login',
@@ -108,7 +111,8 @@ self.addEventListener('fetch', (event) => {
 
     // App shell pages: stale-while-revalidate for faster perceived load
     if (
-        url.pathname === '/' ||
+        url.pathname === '/landing' ||
+        url.pathname === '/demo' ||
         url.pathname === '/quests' ||
         url.pathname === '/profile' ||
         url.pathname === '/tracker' ||
