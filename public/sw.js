@@ -1,4 +1,4 @@
-const CACHE_NAME = 'one-percent-better-v2';
+const CACHE_NAME = 'one-percent-better-v3';
 const OFFLINE_URL = '/offline';
 
 // Static assets to cache immediately
