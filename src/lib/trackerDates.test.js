@@ -31,9 +31,12 @@ test('getEligibleDays excludes dates before habit start', () => {
   assert.deepEqual(eligible, ['2026-02-05', '2026-02-10']);
 });
 
-test('isOnOrAfterHabitCreated respects habit created date', () => {
+test('isOnOrAfterHabitCreated respects habit created date (local)', () => {
   const habit = { created_at: '2026-02-03T12:00:00Z' };
-  assert.equal(isOnOrAfterHabitCreated('2026-02-02', habit), false);
-  assert.equal(isOnOrAfterHabitCreated('2026-02-03', habit), true);
-  assert.equal(isOnOrAfterHabitCreated(new Date(2026, 1, 4), habit), true);
+  const createdLocal = format(new Date(habit.created_at), 'yyyy-MM-dd');
+  const dayBefore = new Date(new Date(habit.created_at).getTime() - 86400000);
+  const dayAfter = new Date(new Date(habit.created_at).getTime() + 86400000);
+  assert.equal(isOnOrAfterHabitCreated(format(dayBefore, 'yyyy-MM-dd'), habit), false);
+  assert.equal(isOnOrAfterHabitCreated(createdLocal, habit), true);
+  assert.equal(isOnOrAfterHabitCreated(dayAfter, habit), true);
 });

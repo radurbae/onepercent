@@ -20,7 +20,9 @@ export function calculateStreak(
 
     let streak = 0;
     let currentDate = today;
-    const createdAtStr = habit.created_at ? habit.created_at.slice(0, 10) : null;
+    const createdAtStr = habit.created_at
+        ? formatDate(new Date(habit.created_at))
+        : null;
 
     // Go backwards from today
     for (let i = 0; i < 365; i++) {
@@ -79,7 +81,9 @@ export function shouldShowNeverMissTwiceWarning(
 
     // For weekday habits, check if yesterday was a weekday
     const yesterday = subDays(today, 1);
-    const createdAtStr = habit.created_at ? habit.created_at.slice(0, 10) : null;
+    const createdAtStr = habit.created_at
+        ? formatDate(new Date(habit.created_at))
+        : null;
     if (createdAtStr && formatDate(yesterday) < createdAtStr) {
         return false;
     }

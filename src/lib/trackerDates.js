@@ -14,7 +14,7 @@ export const getHabitStartDateString = (habit, currentMonth) => {
 
 /** @param {import('@/lib/types').Habit | null | undefined} habit */
 export const getHabitCreatedDateString = (habit) =>
-  habit?.created_at ? habit.created_at.slice(0, 10) : null;
+  habit?.created_at ? format(new Date(habit.created_at), 'yyyy-MM-dd') : null;
 
 /** @param {Date} date */
 /** @param {string} habitStartDateStr */
