@@ -52,7 +52,7 @@ export async function updateSession(request: NextRequest) {
 
     const pathname = request.nextUrl.pathname;
 
-    if (user && (pathname === '/landing' || pathname === '/demo' || pathname === '/privacy' || pathname === '/terms')) {
+    if (user && (pathname === '/landing' || pathname === '/demo' || pathname === '/privacy' || pathname === '/terms' || pathname === '/login')) {
         const url = request.nextUrl.clone();
         url.pathname = '/';
         return NextResponse.redirect(url);
