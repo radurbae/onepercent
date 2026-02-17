@@ -1,8 +1,18 @@
 import { createClient } from '@/lib/supabase/client';
-import type { DailyQuest } from '@/lib/types';
+import type { DailyQuest, QuestCategory, QuestPoolItem } from '@/lib/types';
 import { formatDate } from './dates';
 
 const QUESTS_PER_DAY = 5;
+const QUEST_LOOKBACK_DAYS = 14;
+const CATEGORY_BUCKETS_FOR_STATS: QuestCategory[][] = [
+    ['productivity'],
+    ['learning'],
+    ['social'],
+    ['creativity'],
+    ['wellness', 'fitness'],
+];
+
+type CategoryProgress = Record<QuestCategory, { total: number; completed: number }>;
 
 const PUNISHMENT_MESSAGES = [
     "Yesterday's unfinished quests cost you. Remember: small daily wins compound into massive results.",
@@ -11,6 +21,71 @@ const PUNISHMENT_MESSAGES = [
     "Yesterday you chose comfort over growth. Today, choose differently.",
     "Incomplete quests yesterday? Your future self was counting on you. Make it up today.",
 ];
+
+function createEmptyCategoryProgress(): CategoryProgress {
+    return {
+        wellness: { total: 0, completed: 0 },
+        productivity: { total: 0, completed: 0 },
+        social: { total: 0, completed: 0 },
+        learning: { total: 0, completed: 0 },
+        fitness: { total: 0, completed: 0 },
+        creativity: { total: 0, completed: 0 },
+    };
+}
+
+function shuffleArray<T>(items: T[]): T[] {
+    return [...items].sort(() => Math.random() - 0.5);
+}
+
+function getQuestCategory(questRelation: unknown): QuestCategory | null {
+    if (!questRelation) return null;
+    if (Array.isArray(questRelation)) {
+        const first = questRelation[0] as { category?: QuestCategory } | undefined;
+        return first?.category ?? null;
+    }
+    const single = questRelation as { category?: QuestCategory };
+    return single.category ?? null;
+}
+
+function getCategoryCompletionRate(progress: CategoryProgress, category: QuestCategory): number {
+    const { total, completed } = progress[category];
+    if (total === 0) return 0;
+    return completed / total;
+}
+
+function pickPriorityCategory(
+    categories: QuestCategory[],
+    progress: CategoryProgress
+): QuestCategory | null {
+    if (categories.length === 0) return null;
+
+    const ranked = shuffleArray(categories).sort((a, b) => {
+        const aTotal = progress[a].total;
+        const bTotal = progress[b].total;
+        if (aTotal !== bTotal) return aTotal - bTotal;
+
+        const aRate = getCategoryCompletionRate(progress, a);
+        const bRate = getCategoryCompletionRate(progress, b);
+        return aRate - bRate;
+    });
+
+    return ranked[0] ?? null;
+}
+
+function hasStatCoverageForToday(quests: Array<{ quest?: unknown }>): boolean {
+    const foundCategories = new Set<QuestCategory>();
+
+    for (const quest of quests) {
+        const category = getQuestCategory(quest.quest);
+        if (category) {
+            foundCategories.add(category);
+        }
+    }
+
+    return CATEGORY_BUCKETS_FOR_STATS.every((bucket) =>
+        bucket.some((category) => foundCategories.has(category))
+    );
+}
 
 export interface YesterdayEvaluation {
     missedQuests: number;
@@ -103,7 +178,24 @@ export async function getDailyQuests(): Promise<{ quests: DailyQuest[]; evaluati
         .eq('date', today);
 
     if (existingQuests && existingQuests.length > 0) {
-        return { quests: existingQuests, evaluation: null };
+        const hasCoverage = hasStatCoverageForToday(existingQuests);
+        if (hasCoverage) {
+            return { quests: existingQuests, evaluation: null };
+        }
+
+        const hasCompletedQuest = existingQuests.some((quest) => quest.completed);
+        if (hasCompletedQuest) {
+            return { quests: existingQuests, evaluation: null };
+        }
+
+        await supabase
+            .from('daily_quests')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('date', today);
+
+        const rebalancedQuests = await generateDailyQuests(user.id, today);
+        return { quests: rebalancedQuests, evaluation: null };
     }
 
     const evaluation = await evaluateYesterday();
@@ -116,15 +208,98 @@ export async function getDailyQuests(): Promise<{ quests: DailyQuest[]; evaluati
 async function generateDailyQuests(userId: string, date: string): Promise<DailyQuest[]> {
     const supabase = createClient();
 
-    const { data: questPool } = await supabase
+    const { data: questPoolData } = await supabase
         .from('quest_pool')
         .select('*')
         .eq('is_active', true);
 
+    const questPool = (questPoolData ?? []) as QuestPoolItem[];
+
     if (!questPool || questPool.length === 0) return [];
 
-    const shuffled = [...questPool].sort(() => Math.random() - 0.5);
-    const selectedQuests = shuffled.slice(0, QUESTS_PER_DAY);
+    const lookbackStart = formatDate(new Date(Date.now() - QUEST_LOOKBACK_DAYS * 24 * 60 * 60 * 1000));
+    const { data: recentDailyQuests } = await supabase
+        .from('daily_quests')
+        .select('completed, quest:quest_pool(category)')
+        .eq('user_id', userId)
+        .gte('date', lookbackStart);
+
+    const categoryProgress = createEmptyCategoryProgress();
+    for (const quest of recentDailyQuests ?? []) {
+        const category = getQuestCategory(quest.quest);
+        if (!category) continue;
+        categoryProgress[category].total += 1;
+        if (quest.completed) {
+            categoryProgress[category].completed += 1;
+        }
+    }
+
+    const questsByCategory: Record<QuestCategory, QuestPoolItem[]> = {
+        wellness: [],
+        productivity: [],
+        social: [],
+        learning: [],
+        fitness: [],
+        creativity: [],
+    };
+
+    for (const quest of shuffleArray(questPool)) {
+        questsByCategory[quest.category].push(quest);
+    }
+
+    const selectedQuests: QuestPoolItem[] = [];
+    const selectedQuestIds = new Set<string>();
+    const selectedCategories = new Set<QuestCategory>();
+
+    const addQuestFromCategories = (categories: QuestCategory[]) => {
+        if (selectedQuests.length >= QUESTS_PER_DAY) return;
+
+        const availableCategories = categories.filter((cat) =>
+            questsByCategory[cat].some((quest) => !selectedQuestIds.has(quest.id))
+        );
+        const chosenCategory = pickPriorityCategory(availableCategories, categoryProgress);
+        if (!chosenCategory) return;
+
+        const candidates = questsByCategory[chosenCategory].filter(
+            (quest) => !selectedQuestIds.has(quest.id)
+        );
+        if (candidates.length === 0) return;
+
+        const picked = candidates[Math.floor(Math.random() * candidates.length)];
+        selectedQuests.push(picked);
+        selectedQuestIds.add(picked.id);
+        selectedCategories.add(chosenCategory);
+    };
+
+    // Isi slot utama supaya tiap dimensi stat tetap punya quest harian.
+    for (const bucket of CATEGORY_BUCKETS_FOR_STATS) {
+        addQuestFromCategories(bucket);
+    }
+
+    if (selectedQuests.length < QUESTS_PER_DAY) {
+        const remainingQuests = shuffleArray(questPool)
+            .filter((quest) => !selectedQuestIds.has(quest.id))
+            .sort((a, b) => {
+                const aAlreadyPicked = selectedCategories.has(a.category) ? 1 : 0;
+                const bAlreadyPicked = selectedCategories.has(b.category) ? 1 : 0;
+                if (aAlreadyPicked !== bAlreadyPicked) return aAlreadyPicked - bAlreadyPicked;
+
+                const aTotal = categoryProgress[a.category].total;
+                const bTotal = categoryProgress[b.category].total;
+                if (aTotal !== bTotal) return aTotal - bTotal;
+
+                const aRate = getCategoryCompletionRate(categoryProgress, a.category);
+                const bRate = getCategoryCompletionRate(categoryProgress, b.category);
+                return aRate - bRate;
+            });
+
+        for (const quest of remainingQuests) {
+            if (selectedQuests.length >= QUESTS_PER_DAY) break;
+            selectedQuests.push(quest);
+            selectedQuestIds.add(quest.id);
+            selectedCategories.add(quest.category);
+        }
+    }
 
     const questsToInsert = selectedQuests.map(quest => ({
         user_id: userId,
