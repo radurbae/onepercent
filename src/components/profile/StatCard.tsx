@@ -25,10 +25,12 @@ export default function StatCard({
     onClick
 }: StatCardProps) {
     const [showTooltip, setShowTooltip] = useState(false);
-    const TrendIcon = stat.trend > 0 ? TrendingUp : stat.trend < 0 ? TrendingDown : Minus;
-    const trendColor = stat.trend > 0 ? '#22c55e' : stat.trend < 0 ? '#ef4444' : 'var(--foreground-muted)';
+    const safeValue = Number.isFinite(stat.value) ? Math.min(100, Math.max(0, stat.value)) : 0;
+    const safeTrend = Number.isFinite(stat.trend) ? stat.trend : 0;
+    const TrendIcon = safeTrend > 0 ? TrendingUp : safeTrend < 0 ? TrendingDown : Minus;
+    const trendColor = safeTrend > 0 ? '#22c55e' : safeTrend < 0 ? '#ef4444' : 'var(--foreground-muted)';
 
-    const tier = stat.value >= 80 ? 'S' : stat.value >= 60 ? 'A' : stat.value >= 40 ? 'B' : stat.value >= 20 ? 'C' : 'D';
+    const tier = safeValue >= 80 ? 'S' : safeValue >= 60 ? 'A' : safeValue >= 40 ? 'B' : safeValue >= 20 ? 'C' : 'D';
     const tierColors: Record<string, string> = {
         'S': '#fbbf24',
         'A': '#22c55e',
@@ -98,14 +100,14 @@ export default function StatCard({
                 {/* Tampilan nilai */}
                 <div className="flex items-end gap-2 mb-3">
                     <span
-                        className="text-4xl font-bold tabular-nums"
-                        style={{
-                            color: 'var(--foreground)',
-                            textShadow: stat.value >= 80 ? `0 0 20px ${color}50` : 'none',
-                        }}
-                    >
-                        {stat.value}
-                    </span>
+                            className="text-4xl font-bold tabular-nums"
+                            style={{
+                                color: 'var(--foreground)',
+                                textShadow: safeValue >= 80 ? `0 0 20px ${color}50` : 'none',
+                            }}
+                        >
+                            {safeValue}
+                        </span>
                     <span className="text-sm pb-1" style={{ color: 'var(--foreground-muted)' }}>
                         / 100
                     </span>
@@ -116,7 +118,8 @@ export default function StatCard({
                     <div
                         className="absolute inset-y-0 left-0 rounded-full"
                         style={{
-                            width: `${stat.value}%`,
+                            width: `${safeValue}%`,
+                            minWidth: safeValue > 0 ? '4px' : undefined,
                             background: `linear-gradient(90deg, ${color}, ${color}cc)`,
                             boxShadow: `0 0 8px ${color}60`,
                         }}
@@ -128,7 +131,7 @@ export default function StatCard({
                     <div className="flex items-center gap-1.5">
                         <TrendIcon className="w-3.5 h-3.5" style={{ color: trendColor }} />
                         <span className="text-xs font-medium" style={{ color: trendColor }}>
-                            {stat.trend > 0 ? '+' : ''}{stat.trend}%
+                            {safeTrend > 0 ? '+' : ''}{safeTrend}%
                         </span>
                         <span className="text-[10px]" style={{ color: 'var(--foreground-muted)' }}>
                             this week
@@ -157,4 +160,3 @@ export default function StatCard({
         </button>
     );
 }
-

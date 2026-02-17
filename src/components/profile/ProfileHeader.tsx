@@ -12,13 +12,16 @@ interface ProfileHeaderProps {
 }
 
 export default function ProfileHeader({ profile, email, todaySummary }: ProfileHeaderProps) {
+    const safeLevel = Number.isFinite(profile.level) && profile.level > 0 ? profile.level : 1;
+    const safeXp = Number.isFinite(profile.xp) && profile.xp >= 0 ? profile.xp : 0;
+    const safeGold = Number.isFinite(profile.gold) && profile.gold >= 0 ? profile.gold : 0;
     const rankInfo = getRankInfo(profile.rank || 'E');
     const [animatedPercent, setAnimatedPercent] = useState(0);
 
-    const xpSpent = totalXpForLevel(profile.level);
-    const xpForThisLevel = xpRequiredForLevel(profile.level);
-    const xpIntoLevel = profile.xp - xpSpent;
-    const rawPercent = xpProgressPercent(profile.xp, profile.level);
+    const xpSpent = totalXpForLevel(safeLevel);
+    const xpForThisLevel = xpRequiredForLevel(safeLevel);
+    const xpIntoLevel = Math.max(0, safeXp - xpSpent);
+    const rawPercent = xpProgressPercent(safeXp, safeLevel);
     const xpPercent = Number.isFinite(rawPercent) ? Math.min(100, Math.max(0, rawPercent)) : 0;
     const isReady = xpIntoLevel >= xpForThisLevel;
 
@@ -95,7 +98,7 @@ export default function ProfileHeader({ profile, email, todaySummary }: ProfileH
                                 textShadow: isReady ? '0 0 20px rgba(251, 191, 36, 0.5)' : undefined,
                             }}
                         >
-                            Lv.{profile.level}
+                            Lv.{safeLevel}
                         </span>
                         <span
                             className="px-2 py-0.5 rounded-full text-xs font-semibold"
@@ -128,7 +131,7 @@ export default function ProfileHeader({ profile, email, todaySummary }: ProfileH
                 <div className="text-right">
                     <div className="flex items-center gap-1 text-lg font-semibold text-yellow-500">
                         <span>🪙</span>
-                        <span>{profile.gold.toLocaleString()}</span>
+                        <span>{safeGold.toLocaleString()}</span>
                     </div>
                 </div>
             </div>
@@ -138,7 +141,7 @@ export default function ProfileHeader({ profile, email, todaySummary }: ProfileH
                 <div className="flex items-center justify-between text-xs mb-1">
                     <span style={{ color: 'var(--foreground-muted)' }}>Experience</span>
                     <span style={{ color: isReady ? '#fbbf24' : 'var(--foreground)' }}>
-                        {isReady ? '🎉 Level Up Ready!' : `${xpPercent}% to Lv.${profile.level + 1}`}
+                        {isReady ? '🎉 Level Up Ready!' : `${xpPercent}% to Lv.${safeLevel + 1}`}
                     </span>
                 </div>
 
@@ -187,7 +190,7 @@ export default function ProfileHeader({ profile, email, todaySummary }: ProfileH
                 {/* Angka XP */}
                 <div className="flex items-center justify-between mt-1">
                     <p className="text-xs" style={{ color: 'var(--foreground-muted)' }}>
-                        {profile.xp.toLocaleString()} XP
+                        {safeXp.toLocaleString()} XP
                     </p>
                     <p className="text-xs" style={{ color: 'var(--foreground-muted)' }}>
                         {(xpSpent + xpForThisLevel).toLocaleString()} XP

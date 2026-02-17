@@ -11,6 +11,7 @@ import InsightsCard from '@/components/profile/InsightsCard';
 import { AchievementsRow } from '@/components/profile/AchievementBadge';
 import type { PlayerProfile } from '@/lib/types';
 import { createClient } from '@/lib/supabase/client';
+import { levelFromXp } from '@/lib/utils/rewards';
 import {
     calculateProfileStats,
     getTodaySummary,
@@ -49,7 +50,27 @@ export default function ProfilePage() {
             .single();
 
         if (profileData) {
-            setProfile(profileData);
+            const safeXp = Number.isFinite(profileData.xp) ? profileData.xp : 0;
+            const safeGold = Number.isFinite(profileData.gold) ? profileData.gold : 0;
+            const safeStoredLevel = Number.isFinite(profileData.level) && profileData.level > 0
+                ? profileData.level
+                : 1;
+            const calculatedLevel = levelFromXp(safeXp);
+
+            // Jaga data lama yang level/xp sempat tidak sinkron biar progress bar tetap benar.
+            if (safeStoredLevel !== calculatedLevel) {
+                await supabase
+                    .from('player_profile')
+                    .update({ level: calculatedLevel, xp: safeXp, gold: safeGold })
+                    .eq('user_id', user.id);
+            }
+
+            setProfile({
+                ...profileData,
+                xp: safeXp,
+                gold: safeGold,
+                level: calculatedLevel,
+            });
         }
 
         const [profileStats, summary, streak, achievementList] = await Promise.all([
