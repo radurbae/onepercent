@@ -10,12 +10,32 @@ export async function getEquippedItems(userId: string): Promise<(UserItem & { it
     const { data } = await supabase
         .from('user_items')
         .select(`
+      id,
+      user_id,
+      item_id,
+      equipped,
+      unlocked_at,
       item:items(*)
     `)
         .eq('user_id', userId)
         .eq('equipped', true);
 
-    return (data || []) as (UserItem & { item: Item })[];
+    type UserItemWithJoin = UserItem & { item: Item | Item[] | null };
+
+    const rows = (data ?? []) as UserItemWithJoin[];
+
+    return rows
+        .map((row) => {
+            const normalizedItem = Array.isArray(row.item) ? row.item[0] : row.item;
+            if (!normalizedItem) {
+                return null;
+            }
+            return {
+                ...row,
+                item: normalizedItem,
+            };
+        })
+        .filter((row): row is UserItem & { item: Item } => row !== null);
 }
 
 export async function getEquippedEffects(userId: string): Promise<EquippedEffects> {
